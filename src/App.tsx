@@ -5,6 +5,7 @@ const WS_URL = `ws://${__API_HOST__}:${__API_PORT__}/modelConnector`
 function App() {
   const [connected, setConnected] = useState(false)
   const [messages, setMessages] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
 
   const connect = () => {
@@ -13,11 +14,16 @@ function App() {
 
     ws.onopen = () => {
       setConnected(true)
+      setError(null)
       console.log('WebSocket connected')
     }
 
     ws.onmessage = (event) => {
       setMessages((prev) => [...prev, event.data])
+    }
+
+    ws.onerror = () => {
+      setError('WebSocket connection failed. Is the backend running?')
     }
 
     ws.onclose = () => {
@@ -46,11 +52,14 @@ function App() {
       <button onClick={connected ? disconnect : connect}>
         {connected ? 'Disconnect' : 'Connect'}
       </button>
+      {error && (
+        <div style={{ color: 'red', marginTop: '0.5rem' }}>{error}</div>
+      )}
       <div style={{ marginTop: '1rem' }}>
         <h3>Received Messages</h3>
         <textarea
           readOnly
-          value={messages.join('\n')}
+          value={messages.length > 0 ? messages.join('\n') : 'No messages yet.'}
           rows={10}
           cols={50}
           style={{ width: '100%' }}
