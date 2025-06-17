@@ -1,71 +1,34 @@
-import { useEffect, useRef, useState } from 'react'
-
-const WS_URL = `ws://${__API_HOST__}:${__API_PORT__}/modelConnector`
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
 function App() {
-  const [connected, setConnected] = useState(false)
-  const [messages, setMessages] = useState<string[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const socketRef = useRef<WebSocket | null>(null)
-
-  const connect = () => {
-    if (connected || socketRef.current) return
-    const ws = new WebSocket(WS_URL)
-
-    ws.onopen = () => {
-      setConnected(true)
-      setError(null)
-      console.log('WebSocket connected')
-    }
-
-    ws.onmessage = (event) => {
-      setMessages((prev) => [...prev, event.data])
-    }
-
-    ws.onerror = () => {
-      setError('WebSocket connection failed. Is the backend running?')
-    }
-
-    ws.onclose = () => {
-      setConnected(false)
-      socketRef.current = null
-      console.log('WebSocket disconnected')
-    }
-
-    socketRef.current = ws
-  }
-
-  const disconnect = () => {
-    socketRef.current?.close()
-    socketRef.current = null
-    setConnected(false)
-  }
+  const [count, setCount] = useState(0)
 
   return (
-    <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h2>
-        Status:{' '}
-        <span style={{ color: connected ? 'green' : 'red' }}>
-          {connected ? 'Connected' : 'Disconnected'}
-        </span>
-      </h2>
-      <button onClick={connected ? disconnect : connect}>
-        {connected ? 'Disconnect' : 'Connect'}
-      </button>
-      {error && (
-        <div style={{ color: 'red', marginTop: '0.5rem' }}>{error}</div>
-      )}
-      <div style={{ marginTop: '1rem' }}>
-        <h3>Received Messages</h3>
-        <textarea
-          readOnly
-          value={messages.length > 0 ? messages.join('\n') : 'No messages yet.'}
-          rows={10}
-          cols={50}
-          style={{ width: '100%' }}
-        />
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
       </div>
-    </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
   )
 }
 
